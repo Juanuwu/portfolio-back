@@ -1,6 +1,8 @@
 package com.backend.portfolio.filter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,7 +12,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -49,11 +50,21 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
 
-        Cookie refresh = new Cookie("refresh_token", refresh_token);
-        Cookie access = new Cookie("access_token", access_token);
-        refresh.setHttpOnly(false);
-        access.setHttpOnly(false);
-        response.addCookie(refresh);
-        response.addCookie(access);
+        final ResponseCookie refresh = ResponseCookie
+                .from("refresh_token", refresh_token)
+                .secure(true)
+                .httpOnly(false)
+                .path("/")
+                .sameSite("none")
+                .build();
+        final ResponseCookie access = ResponseCookie
+                .from("access_token", access_token)
+                .secure(true)
+                .httpOnly(false)
+                .path("/")
+                .sameSite("none")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, refresh.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, access.toString());
     }
 }
