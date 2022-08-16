@@ -68,6 +68,7 @@ public class UsuarioController {
                         .withClaim("roles", usuarioModel.getRoles().stream().map(RoleModel::getName).collect(Collectors.toList()))
                         .sign(algorithm);
                 Cookie access = new Cookie("access_token", access_token);
+                access.setHttpOnly(false);
                 access.setPath("/");
                 response.addCookie(access);
             }
