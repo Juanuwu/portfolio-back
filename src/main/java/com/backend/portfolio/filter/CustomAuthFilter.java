@@ -51,6 +51,8 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
 
         Cookie refresh = new Cookie("refresh_token", refresh_token);
         Cookie access = new Cookie("access_token", access_token);
+        refresh.setHttpOnly(false);
+        access.setHttpOnly(false);
         response.addCookie(refresh);
         response.addCookie(access);
     }
