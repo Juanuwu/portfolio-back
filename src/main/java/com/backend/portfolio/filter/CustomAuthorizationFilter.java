@@ -19,9 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 import static java.util.Arrays.stream;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -37,15 +35,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         else {
             Cookie[] cookies = request.getCookies();
             String autorizationHeader = null;
-
             for (Cookie c : cookies) {
                 if (c.getName().equals("access_token"))
-                    autorizationHeader = "Bearer " + c.getValue();
+                    autorizationHeader = c.getValue();
             }
 
-            if(autorizationHeader != null && autorizationHeader.startsWith("Bearer ")){
+            if(autorizationHeader != null) {
                 try {
-                    String token = autorizationHeader.substring("Bearer ".length());
+                    String token = autorizationHeader;
                     Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(token);

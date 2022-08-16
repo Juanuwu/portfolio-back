@@ -54,15 +54,16 @@ public class UsuarioController {
 
     @GetMapping("/refreshToken")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         Cookie[] cookies = request.getCookies();
         String autorizationHeader = null;
         for (Cookie c : cookies) {
             if (c.getName().equals("refresh_token"))
-                autorizationHeader = "Bearer " + c.getValue();
+                autorizationHeader = c.getValue();
         }
-        if(autorizationHeader != null && autorizationHeader.startsWith("Bearer ")){
+        if(autorizationHeader != null ){
             try {
-                String refresh_token = autorizationHeader.substring("Bearer ".length());
+                String refresh_token = autorizationHeader;
                 Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                 JWTVerifier verifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJWT = verifier.verify(refresh_token);
