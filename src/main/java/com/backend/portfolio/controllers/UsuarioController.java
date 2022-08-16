@@ -59,7 +59,7 @@ public class UsuarioController {
         Cookie[] cookies = request.getCookies();
         if (cookies.length > 0) {
             for (Cookie c : cookies) {
-                if (c.getName().equals("access_token")) {
+                if (c.getName().equals("refresh_token")) {
                     autorizationHeader = c.getValue();
                 }
             }
