@@ -8,7 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.WebUtils;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -31,19 +34,18 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         if (request.getServletPath().equals("/login") || request.getServletPath().equals("/api/refreshToken")) {
             filterChain.doFilter(request, response);
         } else {
-            String autorizationHeader = null;
-            Cookie[] cookies = request.getCookies();
-            if (cookies.length > 0) {
-                for (Cookie c : cookies) {
-                    if (c.getName().equals("access_token")) {
-                        autorizationHeader = c.getValue();
-                    }
-                }
+
+            String authorizationHeader = null;
+            Cookie cookie = WebUtils.getCookie(request, "access_token");
+            if (cookie != null) {
+                authorizationHeader = cookie.getValue();
+            } else {
+                filterChain.doFilter(request, response);
             }
 
-                if (autorizationHeader != null) {
+                if (authorizationHeader != null) {
                     try {
-                        String token = autorizationHeader;
+                        String token = authorizationHeader;
                         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                         JWTVerifier verifier = JWT.require(algorithm).build();
                         DecodedJWT decodedJWT = verifier.verify(token);
