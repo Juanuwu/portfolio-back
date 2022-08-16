@@ -80,8 +80,8 @@ public class UsuarioController {
                             .sign(algorithm);
                     final ResponseCookie access = ResponseCookie
                             .from("access_token", access_token)
-                            .secure(false)
-                            .httpOnly(false)
+                            .secure(true)
+                            .httpOnly(true)
                             .path("/")
                             .sameSite("none")
                             .build();
