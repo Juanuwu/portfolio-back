@@ -52,12 +52,14 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
 
         final ResponseCookie refresh = ResponseCookie
                 .from("refresh_token", refresh_token)
+                .secure(true)
                 .httpOnly(false)
                 .path("/")
                 .sameSite("none")
                 .build();
         final ResponseCookie access = ResponseCookie
                 .from("access_token", access_token)
+                .secure(true)
                 .httpOnly(false)
                 .path("/")
                 .sameSite("none")
