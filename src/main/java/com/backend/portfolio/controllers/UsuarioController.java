@@ -14,6 +14,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.WebUtils;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,18 +57,16 @@ public class UsuarioController {
     @GetMapping("/refreshToken")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String autorizationHeader = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies.length > 0) {
-            for (Cookie c : cookies) {
-                if (c.getName().equals("refresh_token")) {
-                    autorizationHeader = c.getValue();
-                }
-            }
+        String authorizationHeader = null;
+        Cookie cookie = WebUtils.getCookie(request, "refresh_token");
+        if (cookie != null) {
+            authorizationHeader = cookie.getValue();
+        } else {
+            throw new RuntimeException("no refresh token :(");
         }
-            if (autorizationHeader != null) {
+            if (authorizationHeader != null) {
                 try {
-                    String refresh_token = autorizationHeader;
+                    String refresh_token = authorizationHeader;
                     Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(refresh_token);
