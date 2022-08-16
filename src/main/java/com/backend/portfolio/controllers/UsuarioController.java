@@ -57,7 +57,7 @@ public class UsuarioController {
         Cookie[] cookies = request.getCookies();
         String autorizationHeader = null;
         for (Cookie c : cookies) {
-            if (c.getName().equals("access_token"))
+            if (c.getName().equals("refresh_token"))
                 autorizationHeader = "Bearer " + c.getValue();
         }
         if(autorizationHeader != null && autorizationHeader.startsWith("Bearer ")){
