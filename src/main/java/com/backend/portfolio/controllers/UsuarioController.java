@@ -32,22 +32,22 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @GetMapping("/usuarios/userList")
-    public ResponseEntity<List<UsuarioModel>>getUsers(){
+    public ResponseEntity<List<UsuarioModel>> getUsers() {
         return ResponseEntity.ok().body(usuarioService.getUsers());
     }
 
     @PostMapping("/usuarios/save")
-    public ResponseEntity<UsuarioModel>saveUser(@RequestBody UsuarioModel usuarioModel){
+    public ResponseEntity<UsuarioModel> saveUser(@RequestBody UsuarioModel usuarioModel) {
         return ResponseEntity.ok().body(usuarioService.saveUser(usuarioModel));
     }
 
     @PostMapping("/usuarios/saveRole")
-    public ResponseEntity<RoleModel>saveRole(@RequestBody RoleModel roleModel   ){
+    public ResponseEntity<RoleModel> saveRole(@RequestBody RoleModel roleModel) {
         return ResponseEntity.ok().body(usuarioService.saveRole(roleModel));
     }
 
     @PostMapping("/usuarios/addRole")
-    public ResponseEntity<?>addRole(@RequestBody RoleToUserForm form){
+    public ResponseEntity<?> addRole(@RequestBody RoleToUserForm form) {
         usuarioService.addRole(form.getRoleName(), form.getRoleName());
         return ResponseEntity.ok().build();
     }
@@ -55,54 +55,53 @@ public class UsuarioController {
     @GetMapping("/refreshToken")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        Cookie[] cookies = request.getCookies();
         String autorizationHeader = null;
-        for (Cookie c : cookies) {
-            if (c.getName().equals("refresh_token"))
-            {
-                autorizationHeader = c.getValue();
-            }
-            else autorizationHeader = null;
-        }
-        if(autorizationHeader != null ){
-            try {
-                String refresh_token = autorizationHeader;
-                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-                JWTVerifier verifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = verifier.verify(refresh_token);
-                String username = decodedJWT.getSubject();
-                UsuarioModel usuarioModel = usuarioService.getUser(username);
-                String access_token = JWT.create()
-                        .withSubject(usuarioModel.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                        .withIssuer(request.getRequestURL().toString())
-                        .withClaim("roles", usuarioModel.getRoles().stream().map(RoleModel::getName).collect(Collectors.toList()))
-                        .sign(algorithm);
-                final ResponseCookie access = ResponseCookie
-                        .from("access_token", access_token)
-                        .secure(false)
-                        .httpOnly(false)
-                        .path("/")
-                        .sameSite("none")
-                        .build();
-                response.addHeader(HttpHeaders.SET_COOKIE, access.toString());
-            }
-            catch (Exception exception){
-                log.error("Error logging in: {}", exception.getMessage());
-                response.setHeader("error",exception.getMessage());
-                response.setStatus((FORBIDDEN.value()));
-                Map<String, String> error = new HashMap<>();
-                error.put("error_message", exception.getMessage());
-                response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
+        Cookie[] cookies = request.getCookies();
+        if (cookies.length > 0) {
+            for (Cookie c : cookies) {
+                if (c.getName().equals("access_token")) {
+                    autorizationHeader = c.getValue();
+                }
             }
         }
-        else{
-            throw new RuntimeException("no refresh token :(");
+            if (autorizationHeader != null) {
+                try {
+                    String refresh_token = autorizationHeader;
+                    Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+                    JWTVerifier verifier = JWT.require(algorithm).build();
+                    DecodedJWT decodedJWT = verifier.verify(refresh_token);
+                    String username = decodedJWT.getSubject();
+                    UsuarioModel usuarioModel = usuarioService.getUser(username);
+                    String access_token = JWT.create()
+                            .withSubject(usuarioModel.getUsername())
+                            .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                            .withIssuer(request.getRequestURL().toString())
+                            .withClaim("roles", usuarioModel.getRoles().stream().map(RoleModel::getName).collect(Collectors.toList()))
+                            .sign(algorithm);
+                    final ResponseCookie access = ResponseCookie
+                            .from("access_token", access_token)
+                            .secure(false)
+                            .httpOnly(false)
+                            .path("/")
+                            .sameSite("none")
+                            .build();
+                    response.addHeader(HttpHeaders.SET_COOKIE, access.toString());
+                } catch (Exception exception) {
+                    log.error("Error logging in: {}", exception.getMessage());
+                    response.setHeader("error", exception.getMessage());
+                    response.setStatus((FORBIDDEN.value()));
+                    Map<String, String> error = new HashMap<>();
+                    error.put("error_message", exception.getMessage());
+                    response.setContentType(APPLICATION_JSON_VALUE);
+                    new ObjectMapper().writeValue(response.getOutputStream(), error);
+                }
+            } else {
+                throw new RuntimeException("no refresh token :(");
+            }
         }
+
     }
 
-}
 @Data
 class RoleToUserForm{
     private String username;
