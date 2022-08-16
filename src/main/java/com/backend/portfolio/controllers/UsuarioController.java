@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
@@ -67,10 +69,13 @@ public class UsuarioController {
                         .withIssuer(request.getRequestURL().toString())
                         .withClaim("roles", usuarioModel.getRoles().stream().map(RoleModel::getName).collect(Collectors.toList()))
                         .sign(algorithm);
-                Cookie access = new Cookie("access_token", access_token);
-                access.setHttpOnly(false);
-                access.setPath("/");
-                response.addCookie(access);
+                final ResponseCookie access = ResponseCookie
+                        .from("access_token", access_token)
+                        .httpOnly(false)
+                        .path("/")
+                        .sameSite("none")
+                        .build();
+                response.addHeader(HttpHeaders.SET_COOKIE, access.toString());
             }
             catch (Exception exception){
                 log.error("Error logging in: {}", exception.getMessage());
