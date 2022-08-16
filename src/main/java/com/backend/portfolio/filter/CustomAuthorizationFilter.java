@@ -36,8 +36,10 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             Cookie[] cookies = request.getCookies();
             String autorizationHeader = null;
             for (Cookie c : cookies) {
-                if (c.getName().equals("access_token"))
+                if (c.getName().equals("access_token")) {
                     autorizationHeader = c.getValue();
+                }
+                else autorizationHeader = null;
             }
 
             if(autorizationHeader != null) {

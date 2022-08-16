@@ -59,7 +59,10 @@ public class UsuarioController {
         String autorizationHeader = null;
         for (Cookie c : cookies) {
             if (c.getName().equals("refresh_token"))
+            {
                 autorizationHeader = c.getValue();
+            }
+            else autorizationHeader = null;
         }
         if(autorizationHeader != null ){
             try {
