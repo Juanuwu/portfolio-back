@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,7 +35,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
         }
         else {
-            String autorizationHeader = request.getHeader(AUTHORIZATION);
+            Cookie[] cookies = request.getCookies();
+            String autorizationHeader = null;
+
+            for (Cookie c : cookies) {
+                if (c.getName().equals("access_token"))
+                    autorizationHeader = "Bearer " + c.getValue();
+            }
+
             if(autorizationHeader != null && autorizationHeader.startsWith("Bearer ")){
                 try {
                     String token = autorizationHeader.substring("Bearer ".length());

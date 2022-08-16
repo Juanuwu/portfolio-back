@@ -54,7 +54,12 @@ public class UsuarioController {
 
     @GetMapping("/refreshToken")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String autorizationHeader = request.getHeader(AUTHORIZATION);
+        Cookie[] cookies = request.getCookies();
+        String autorizationHeader = null;
+        for (Cookie c : cookies) {
+            if (c.getName().equals("access_token"))
+                autorizationHeader = "Bearer " + c.getValue();
+        }
         if(autorizationHeader != null && autorizationHeader.startsWith("Bearer ")){
             try {
                 String refresh_token = autorizationHeader.substring("Bearer ".length());
