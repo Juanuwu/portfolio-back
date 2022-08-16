@@ -11,7 +11,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         registry.addMapping("/**")
                 .allowedOrigins("http://181.231.74.169:4200")
                 .allowCredentials(true)
-                .allowedHeaders(*)
+                .allowedHeaders("*")
                 .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
 
     }
