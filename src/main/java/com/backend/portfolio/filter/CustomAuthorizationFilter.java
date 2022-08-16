@@ -34,18 +34,10 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         if (request.getServletPath().equals("/login") || request.getServletPath().equals("/api/refreshToken")) {
             filterChain.doFilter(request, response);
         } else {
-
-            String authorizationHeader = null;
             Cookie cookie = WebUtils.getCookie(request, "access_token");
-            if (cookie != null) {
-                authorizationHeader = cookie.getValue();
-            } else {
-                filterChain.doFilter(request, response);
-            }
-
-                if (authorizationHeader != null) {
+                if (cookie != null) {
                     try {
-                        String token = authorizationHeader;
+                        String token = cookie.getValue();
                         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
                         JWTVerifier verifier = JWT.require(algorithm).build();
                         DecodedJWT decodedJWT = verifier.verify(token);
