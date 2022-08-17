@@ -15,9 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -52,12 +50,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/refreshToken").permitAll()
                 .antMatchers(HttpMethod.POST).hasAuthority("ROLE_ADMIN")
                 .antMatchers( "/api/usuarios/**").hasAuthority("ROLE_ADMIN")
-                .antMatchers(HttpMethod.DELETE).hasAuthority("ROLE_ADMIN")
-                .and()
-                .logout(logout -> logout
-                .logoutUrl("/logout")
-                .addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter()))
-        );
+                .antMatchers(HttpMethod.DELETE).hasAuthority("ROLE_ADMIN").and()
+                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
         http.addFilter(customAuthFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
