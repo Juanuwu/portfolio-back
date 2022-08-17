@@ -51,10 +51,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST).hasAuthority("ROLE_ADMIN")
                 .antMatchers( "/api/usuarios/**").hasAuthority("ROLE_ADMIN")
                 .antMatchers(HttpMethod.DELETE).hasAuthority("ROLE_ADMIN")
-                .antMatchers("/logout").hasAuthority("ROLE_ADMIN").and()
-                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-        http.addFilter(customAuthFilter);
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .antMatchers("/logout").hasAuthority("ROLE_ADMIN");
+        http.logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .deleteCookies("access_token", "refresh_token")
+        );
 
     }
     @Bean
