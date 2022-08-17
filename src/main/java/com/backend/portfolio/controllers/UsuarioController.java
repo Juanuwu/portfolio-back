@@ -83,6 +83,7 @@ public class UsuarioController {
                             .secure(true)
                             .httpOnly(true)
                             .path("/")
+                            .sameSite("none")
                             .build();
                     response.addHeader(HttpHeaders.SET_COOKIE, access.toString());
                 } catch (Exception exception) {
