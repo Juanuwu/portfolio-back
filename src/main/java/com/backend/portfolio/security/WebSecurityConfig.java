@@ -50,8 +50,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/refreshToken").permitAll()
                 .antMatchers(HttpMethod.POST).hasAuthority("ROLE_ADMIN")
                 .antMatchers( "/api/usuarios/**").hasAuthority("ROLE_ADMIN")
-                .antMatchers(HttpMethod.DELETE).hasAuthority("ROLE_ADMIN").and()
-                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
+                .antMatchers(HttpMethod.DELETE).hasAuthority("ROLE_ADMIN")
+                .antMatchers("/logout").hasAuthority("ROLE_ADMIN").and()
+                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
         http.addFilter(customAuthFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
