@@ -55,14 +55,12 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
                 .secure(true)
                 .httpOnly(true)
                 .path("/")
-                .sameSite("none")
                 .build();
         final ResponseCookie access = ResponseCookie
                 .from("access_token", access_token)
                 .secure(true)
                 .httpOnly(true)
                 .path("/")
-                .sameSite("none")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refresh.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, access.toString());
