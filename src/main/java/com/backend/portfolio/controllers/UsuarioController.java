@@ -83,7 +83,6 @@ public class UsuarioController {
                             .secure(true)
                             .httpOnly(true)
                             .path("/")
-                            .domain("portfolio-front-353603.web.app")
                             .sameSite("none")
                             .build();
                     response.addHeader(HttpHeaders.SET_COOKIE, access.toString());

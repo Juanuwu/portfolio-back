@@ -56,7 +56,6 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
                 .httpOnly(true)
                 .path("/")
                 .sameSite("none")
-                .domain("portfolio-front-353603.web.app")
                 .build();
         final ResponseCookie access = ResponseCookie
                 .from("access_token", access_token)
@@ -64,7 +63,6 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
                 .httpOnly(true)
                 .path("/")
                 .sameSite("none")
-                .domain("portfolio-front-353603.web.app")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refresh.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, access.toString());
