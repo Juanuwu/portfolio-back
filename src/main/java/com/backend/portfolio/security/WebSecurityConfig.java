@@ -15,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -50,8 +49,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/refreshToken").permitAll()
                 .antMatchers(HttpMethod.POST).hasAuthority("ROLE_ADMIN")
                 .antMatchers( "/api/usuarios/**").hasAuthority("ROLE_ADMIN")
-                .antMatchers(HttpMethod.DELETE).hasAuthority("ROLE_ADMIN")
-                .antMatchers("/logout").hasAuthority("ROLE_ADMIN");
+                .antMatchers(HttpMethod.DELETE).hasAuthority("ROLE_ADMIN");
+        http.addFilter(customAuthFilter);
+        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
     @Bean
