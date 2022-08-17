@@ -44,6 +44,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         customAuthFilter.setFilterProcessesUrl("/login");
         http.csrf().disable();
         http.cors();
+        http.logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .deleteCookies("access_token", "refresh_token")
+        );
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
                 .antMatchers("/login/**").permitAll()
@@ -52,12 +58,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers( "/api/usuarios/**").hasAuthority("ROLE_ADMIN")
                 .antMatchers(HttpMethod.DELETE).hasAuthority("ROLE_ADMIN")
                 .antMatchers("/logout").hasAuthority("ROLE_ADMIN");
-        http.logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
-                .deleteCookies("access_token", "refresh_token")
-        );
 
     }
     @Bean
